@@ -28,6 +28,52 @@ All required files can be download [here][1]. It includes:
 - TM-AC1900_3.0.0.4_376_1703-g0ffdbba.trx: Downgrade to this version of the T-Mobile firmware to enable SSH. Requires the router to be set to rescue mode. This firmware downgrade is not needed if the HTML hack works to enable SSH/Telnet.
 
 # Instructions
-* TODO
+## Changing the computer's IP address
+The router's default address is probably 192.168.29.1. First, it's worth setting a static IP address for the computer before changing the firmware of the router. It's also best to use ethernet to connect to the router rather than Wi-Fi. Go to Control Panel -> Change adapter settings -> right click the appropriate connection -> select Internet Protocol Version 4 -> click on properties -> Use the following IP address -> change IP address to 192.168.29.9, leave the subnet mask as is, set the default gateway to 192.168.29.1. The DNS settings can be left as is, if you have to put in some IPs, use 8.8.8.8 and 8.8.4.4, which are Google's DNS.
+## Part 1 - Getting an older version of the T-Mobile firmware to enable SSH/Telnet
+This step can be skipped if you are able to edit the HTML in the router software under Administration->System or by going straight to http://192.168.1.1/Advanced_System_Content.asp. Right click on the page and select inspect element, search HTML for *sshd_enable*
+```
+<select name="sshd_enable" class="input_option" onchange="check_sshd_enable(this.value);">
+<option value="0">No</option>
+<option value="1">LAN + WAN</option>
+<option value="2" selected="">LAN only</option>
+</select>
+```
+or search for *telnetd*
+```
+<tr id="telnet_tr">
+<th>Enable Telnet</th>
+<td>
+<input name="telnetd_enable" value="1" type="radio">Yes
+<input name="telnetd_enable" value="0" checked="" type="radio">No
+</td>
+</tr>
+```
+You will find that there might be a disabled flag in the HTML, delete it and press *enter*, and you should be able to see the ssh/telnet options. Check the appropriate option and try Part 2, if it works, this part can be skipped.
+
+The router needs to be put in recovery mode, which is somewhat more difficult with T-Mobile's firmware. 
+1. Remove power to the router
+2. hold both the reset and WPS buttons at the same time
+3. Turn on the router, keep holding those buttons
+4. Navigate to 192.168.29.1 while holding the buttons. If you don't see Mini-CFE on the page, open Resuce.exe from the files downloaded before.
+5. While continuing to hold the buttons, upload TM-AC1900_3.0.0.4_376_1703-g0ffdbba.trx. Keep holding the buttons while the upload is happening. Do not release until the upload is complete, this may take a minute.
+6. Reboot the router
+7. Wipe NVRAM, which can be done in one of two ways: 
+    1. Command line
+        - SSH/Telnet into the router and in the command line type "mtd-erase2 nvram", press *enter*
+        - type "reboot", press *enter*
+    2. Hardware
+        - Power off the router
+        - Wait 10 seconds
+        - Hold the WPS button
+        - Power on the router while continuing to hold the WPS button. Release WPS button after 20 seconds.
+
+## Part 2 - SSH/Telnet into the router
+For a quick 101 into the command line, all commands are run by pressing the *enter* button. Make sure there are no typos, once the *enter* is pressed, the command is run and if there is a problem there may be no way back.
+
+
+
+
+
 
 [1]: https://mega.nz/#!040jGIRS!h3yxFOjlt6MoaDUfJmgqm34PPMjhn09S4j36mt4LOAo
